@@ -19,10 +19,10 @@ router.post('/', [
 
     const { email, name, password } = req.body;
     try {
-        let user = await User.findOne({email});
+        let user = await User.findOne({ email });
         if (user) {
             return res.status(500).json({
-                "errors": "internal error"
+                "errors": "duplicate user"
             });
         }
 
@@ -48,19 +48,19 @@ router.post('/', [
             }
         };
         jwt.sign(
-            payload, 
+            payload,
             config.get('jwtSecret'),
             {
                 expiresIn: 36000
             },
             (error, token) => {
                 if (error) throw error;
-                res.json({token})
+                res.json({ token })
             }
-            );
+        );
     } catch (e) {
         console.error(e.message);
-        res.status(500).send({"msg": "Server error"});
+        res.status(500).send({ "msg": "Server error" });
     }
 });
 

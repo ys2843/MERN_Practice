@@ -13,6 +13,6 @@ module.exports = function (req, res, next) {
         req.user = payload.user;
         next();
     } catch (e) {
-        res.status(401).json({msg: "jwt token not valid"});
+        res.status(401).json({ msg: "jwt token not valid" });
     }
 }

@@ -1,7 +1,6 @@
 const mongoos = require('mongoose');
 const config = require('config');
 const DBUrl = config.get('mongoURL');
-console.log(DBUrl)
 const connectDB = async () => {
     try {
         await mongoos.connect(DBUrl, {

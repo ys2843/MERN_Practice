@@ -58,6 +58,13 @@ router.post('/', [
     if (instagram) newProfile.social.youtube = instagram;
     if (linkedin) newProfile.social.youtube = linkedin;
 
+    newProfile.social = {};
+    if (youtube) newProfile.social.youtube = youtube;
+    if (twitter) newProfile.social.twitter = twitter;
+    if (facebook) newProfile.social.facebook = facebook;
+    if (linkedin) newProfile.social.linkedin = linkedin;
+    if (instagram) newProfile.social.instagram = instagram;
+
     try {
         let profile = await Profile.findOne({ user: req.user.id });
         if (profile) {
@@ -68,9 +75,10 @@ router.post('/', [
             );
             return res.json(profile);
         }
+        
         profile = new Profile(newProfile);
         profile.save();
-        res.json(profile);
+        return res.json(profile);
     } catch (error) {
         console.error(error.message);
         res.states(500).send("Server Error");

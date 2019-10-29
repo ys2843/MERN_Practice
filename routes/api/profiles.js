@@ -75,13 +75,41 @@ router.post('/', [
             );
             return res.json(profile);
         }
-        
+
         profile = new Profile(newProfile);
         profile.save();
         return res.json(profile);
     } catch (error) {
         console.error(error.message);
         res.states(500).send("Server Error");
+    }
+});
+
+// @route GET  api/profile
+// @desc  GET all profiles
+// @access Public
+router.get('/', async (req, res) => {
+    try {
+        let profiles = await Profile.find().populate('user', ['name', 'avatar']);
+        res.json(profiles);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Server Error")
+    }
+});
+
+// @route   GET    api/profile/user/:user_id
+// @desc    GET    profile by id
+// @access  Private
+router.get('/user/:user_id', async (req, res) => {
+    try {
+        let profile = await Profile.findOne({ user: req.params.user_id }).populate('user', ['name', 'avatar']);
+        if (!profile) return res.status('400').send("no matching user");
+        return res.json(profile);
+    } catch (error) {
+        console.error(error.message);
+        if (error.kind == 'ObjectIds') return res.status('400').send("no matching user");
+        res.status(500).send("Server Error")
     }
 });
 

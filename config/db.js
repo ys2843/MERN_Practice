@@ -5,7 +5,8 @@ const connectDB = async () => {
     try {
         await mongoos.connect(DBUrl, {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useFindAndModify: false
         });
         console.log("connected to database");
     } catch (e) {

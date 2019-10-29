@@ -3,6 +3,7 @@ const router = express.Router();
 const Profile = require('../../models/Profile');
 const auth = require('../../middleware/auth');
 const { check, validationResult } = require('express-validator/check');
+const User = require('../../models/User');
 
 router.get('/me', auth, async (req, res) => {
     try {
@@ -110,6 +111,65 @@ router.get('/user/:user_id', async (req, res) => {
         console.error(error.message);
         if (error.kind == 'ObjectIds') return res.status('400').send("no matching user");
         res.status(500).send("Server Error")
+    }
+});
+
+// @route   DELETE    api/profile
+// @desc    GET    Delete profile, user & posts
+// @access  Private
+router.delete('/', auth, async (req, res) => {
+    try {
+        await Profile.findOneAndRemove({ user: req.user.id });
+        await User.findOneAndRemove({ _id: req.user.id });
+        res.send('deleted user');
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("server error");
+    }
+});
+
+// @route   PUT    api/profile/experience
+// @desc    Add profile exp
+// @access  Private
+router.put('/experience', [auth, [
+    check('title', 'title is required').not().isEmpty(),
+    check('company', 'company is required').not().isEmpty(),
+    check('from', 'from is required').not().isEmpty(),
+]], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const {
+        title,
+        company,
+        location,
+        from,
+        to,
+        current,
+        description
+    } = req.body;
+
+    const newExp = {
+        title,
+        company,
+        location,
+        from,
+        to,
+        current,
+        description
+    };
+
+    try {
+        let profile = await Profile.findOne({ user: req.user.id });
+        if (!profile) return res.status(400).send("no profile found");
+        profile.experience.unshift(newExp);
+        profile.save();
+        return res.json(newExp);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("server error");
     }
 });
 
